@@ -10,6 +10,7 @@ import os
 import platform
 import re
 import shutil
+import sqlite3
 import socket
 import subprocess
 import sys
@@ -26,7 +27,8 @@ APP_PATH = APP_DIR / 'app.py'
 CONFIG_PATH = APP_DIR / 'config.json'
 ADVENTURE_STATE_PATH = APP_DIR / 'adventure_state.json'
 PERMISSION_REPAIR_LOG_PATH = APP_DIR / 'update-permission-repair.log'
-APP_VERSION = '7.607.0'
+DECISION_QUEUE_DB = Path('/var/lib/baypark-decision-queue/questions.sqlite3')
+APP_VERSION = '7.609.0'
 MAX_FETCH_BYTES = 160000
 FETCH_TIMEOUT = 10
 RESTART_REQUESTED = False
@@ -327,11 +329,32 @@ def download_bytes(url, limit=600000):
     return data
 
 
+def version_tuple(value):
+    parts = []
+    for piece in str(value).strip().split('.'):
+        match = re.match(r'(\d+)', piece)
+        parts.append(int(match.group(1)) if match else 0)
+    while len(parts) < 3:
+        parts.append(0)
+    return tuple(parts[:4])
+
+
+def app_version_from_bytes(data):
+    text = data.decode('utf-8', errors='strict')
+    match = re.search(r"(?m)^APP_VERSION\s*=\s*['\"]([^'\"]+)['\"]", text)
+    if not match:
+        raise ValueError('Remote app.py has no APP_VERSION')
+    return match.group(1)
+
+
 def validate_update(filename, data):
     if filename == 'app.py':
         compile(data.decode('utf-8'), filename, 'exec')
         if b'APP_DIR' not in data or b'Network Assistant AI' not in data:
             raise ValueError('Remote app.py did not pass identity checks')
+        remote_version = app_version_from_bytes(data)
+        if version_tuple(remote_version) < version_tuple(APP_VERSION):
+            raise ValueError(f'Refusing downgrade from {APP_VERSION} to {remote_version}')
     elif filename.endswith('.json'):
         json.loads(data.decode('utf-8'))
 
@@ -557,11 +580,146 @@ def github_update_help_text():
     )
 
 
+
+def decision_db_connect():
+    DECISION_QUEUE_DB.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(DECISION_QUEUE_DB), timeout=10)
+    conn.row_factory = sqlite3.Row
+    conn.execute('PRAGMA journal_mode=WAL')
+    conn.execute('PRAGMA busy_timeout=10000')
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS questions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            request_id TEXT NOT NULL UNIQUE,
+            question TEXT NOT NULL,
+            extra_context TEXT,
+            raw_email_id TEXT,
+            submitted_at TEXT NOT NULL,
+            status TEXT NOT NULL DEFAULT 'pending',
+            answer TEXT,
+            answered_at TEXT,
+            sent_at TEXT
+        )
+    """)
+    conn.commit()
+    return conn
+
+
+def pending_questions_text(limit=20):
+    try:
+        with decision_db_connect() as conn:
+            rows = conn.execute(
+                "SELECT id, request_id, question, submitted_at FROM questions WHERE status='pending' ORDER BY id ASC LIMIT ?",
+                (limit,),
+            ).fetchall()
+    except Exception as exc:
+        return f"Decision queue could not be read: {type(exc).__name__}: {exc}"
+    if not rows:
+        return 'There are no pending Decision Tree Assistant questions.'
+    lines = ['Pending Decision Tree Assistant questions:']
+    for row in rows:
+        summary = re.sub(r'\s+', ' ', row['question']).strip()
+        if len(summary) > 180:
+            summary = summary[:177] + '...'
+        lines.append(f"{row['id']}. Request {row['request_id']} ({row['submitted_at']})\n   {summary}")
+    lines.append('\nUse: open question NUMBER')
+    lines.append('To answer: answer question NUMBER YOUR ANSWER')
+    return '\n'.join(lines)
+
+
+def open_question_text(question_id):
+    try:
+        with decision_db_connect() as conn:
+            row = conn.execute('SELECT * FROM questions WHERE id=?', (question_id,)).fetchone()
+    except Exception as exc:
+        return f"Decision queue could not be read: {type(exc).__name__}: {exc}"
+    if row is None:
+        return f'Question {question_id} was not found.'
+    return (
+        f"Question {row['id']}\nRequest ID: {row['request_id']}\nStatus: {row['status']}\n"
+        f"Submitted: {row['submitted_at']}\nQuestion:\n{row['question']}\n\n"
+        f"Extra context:\n{row['extra_context'] or '(none)'}\n\nAnswer:\n{row['answer'] or '(not answered yet)'}"
+    )
+
+
+def answer_question_text(question_id, answer_text):
+    answer_text = answer_text.strip()
+    if not answer_text:
+        return 'The answer is empty. Use: answer question NUMBER YOUR ANSWER'
+    if len(answer_text) > 12000:
+        return 'The answer is too long. Keep it under 12,000 characters.'
+    try:
+        with decision_db_connect() as conn:
+            row = conn.execute('SELECT status FROM questions WHERE id=?', (question_id,)).fetchone()
+            if row is None:
+                return f'Question {question_id} was not found.'
+            if row['status'] == 'sent':
+                return f'Question {question_id} was already sent by email and cannot be changed here.'
+            conn.execute("UPDATE questions SET answer=?, status='answered', answered_at=? WHERE id=?", (answer_text, now_iso(), question_id))
+            conn.commit()
+        return f'Answer saved for question {question_id}. The existing dt-out email process will send it on its next polling cycle.'
+    except Exception as exc:
+        return f"The answer could not be saved: {type(exc).__name__}: {exc}"
+
+
+def decision_queue_status_text():
+    try:
+        with decision_db_connect() as conn:
+            counts = {row['status']: row['count'] for row in conn.execute('SELECT status, COUNT(*) AS count FROM questions GROUP BY status').fetchall()}
+            latest = conn.execute('SELECT id, request_id, status, submitted_at FROM questions ORDER BY id DESC LIMIT 1').fetchone()
+    except Exception as exc:
+        return f"Decision queue status is unavailable: {type(exc).__name__}: {exc}"
+    lines = [
+        'Decision Tree human-answer queue status:',
+        f"Pending: {counts.get('pending', 0)}",
+        f"Answered and waiting for email: {counts.get('answered', 0)}",
+        f"Sent: {counts.get('sent', 0)}",
+    ]
+    if latest:
+        lines.append(f"Latest: question {latest['id']}, request {latest['request_id']}, status {latest['status']}, submitted {latest['submitted_at']}")
+    return '\n'.join(lines)
+
+
+def decision_tree_github_help_text():
+    repo = CONFIG.get('github_repo', 'we6jbo/baypark-ollama-console')
+    branch = CONFIG.get('github_branch', 'main')
+    command = (
+        "sudo bash -c \"$(curl -fsSL "
+        f"https://raw.githubusercontent.com/{repo}/{branch}/install-decision-tree-integration.sh)\""
+    )
+    return (
+        'Decision Tree email integration update:\n'
+        '1. Push app.py, dt-core/main.py, dt-core/human_queue.py, and '
+        'install-decision-tree-integration.sh to GitHub.\n'
+        '2. Run this once in the Raspberry Pi terminal:\n' + command + '\n'
+        '3. The Android email app remains unchanged. Incoming dt-in email questions '
+        'will wait for a human answer in Network Assistant, and the existing dt-out '
+        'email sender will send the answer.'
+    )
+
+
 def answer(prompt):
     text = prompt.strip()
     low = re.sub(r'\s+', ' ', text.lower())
     if not text:
         return 'Type a question or command first.', clickable_links_html()
+
+
+    if low in {'decision tree update help', 'decision integration help', 'email integration help'}:
+        return decision_tree_github_help_text(), clickable_links_html()
+
+    if low in {'pending questions', 'list pending questions', 'decision questions', 'questions waiting'}:
+        return pending_questions_text(), clickable_links_html()
+    if low in {'decision queue status', 'question queue status', 'email question status'}:
+        return decision_queue_status_text(), clickable_links_html()
+    match = re.fullmatch(r'(?:open|show|read) question\s+(\d+)', low)
+    if match:
+        return open_question_text(int(match.group(1))), clickable_links_html()
+    match = re.match(r'answer question\s+(\d+)\s+(.+)', text, flags=re.IGNORECASE | re.DOTALL)
+    if match:
+        return answer_question_text(int(match.group(1)), match.group(2)), clickable_links_html()
+    if low.startswith('answer question'):
+        return 'Use: answer question NUMBER YOUR ANSWER', clickable_links_html()
 
     adventure_reply, missing_room = adventure_command(text)
     if adventure_reply:
@@ -610,7 +768,7 @@ def answer(prompt):
     update_message, changed = check_github_updates()
     normal = (
         'I am Network Assistant AI. Try:\n'
-        '- version\n- check updates\n- update help\n- permission repair log\n- check netnut\n- local links\n- simple check\n'
+        '- decision tree update help\n- pending questions\n- open question NUMBER\n- answer question NUMBER YOUR ANSWER\n- decision queue status\n- version\n- check updates\n- update help\n- permission repair log\n- check netnut\n- local links\n- simple check\n'
         '- system status\n- list sources\n- fetch example\n- fetch crime report\n'
         '- fetch power outages\n- fetch news report\n- fetch environmental factors\n'
         '- look\n- open mailbox\n- take leaflet\n- inventory\n- reset game\n'
@@ -693,7 +851,7 @@ function askPreset(q){{document.getElementById('prompt').value=q;document.getEle
 <button type="button" onclick="askPreset('look')">Look</button></form></div>
 <div class="card"><h2>Answer</h2><button onclick="copyAnswer()">Copy answer</button> <span id="copymsg" class="small"></span>
 <pre id="answerbox">{esc(reply)}</pre><div>{links}</div></div>
-<div class="card small">Commands: version. check updates. update help. permission repair log. check netnut. local links. simple check. system status. list sources. fetch example. fetch crime report. fetch power outages. fetch news report. fetch environmental factors. look. open mailbox. take leaflet. inventory. reset game. north. south. east. west.</div>
+<div class="card small">Commands: decision tree update help. pending questions. open question NUMBER. answer question NUMBER YOUR ANSWER. decision queue status. version. check updates. update help. permission repair log. check netnut. local links. simple check. system status. list sources. fetch example. fetch crime report. fetch power outages. fetch news report. fetch environmental factors. look. open mailbox. take leaflet. inventory. reset game. north. south. east. west.</div>
 </body></html>'''
         self.send_body(page)
 
