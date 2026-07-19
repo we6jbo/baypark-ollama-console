@@ -1,0 +1,65 @@
+[
+  {
+    "name": "example",
+    "display_name": "Example.com connection test",
+    "protocol": "https",
+    "url": "https://example.com/",
+    "description": "Small test website used by the simple connection check"
+  },
+  {
+    "name": "san-diego",
+    "display_name": "City of San Diego",
+    "protocol": "https",
+    "url": "https://www.sandiego.gov/",
+    "description": "Official City of San Diego website"
+  },
+  {
+    "name": "power-outages",
+    "display_name": "SDG&E outage map",
+    "protocol": "https",
+    "url": "https://www.sdge.com/residential/customer-service/outage-center/outage-map",
+    "description": "Official San Diego Gas & Electric outage information"
+  },
+  {
+    "name": "crime-report",
+    "display_name": "San Diego crime statistics and mapping",
+    "protocol": "https",
+    "url": "https://www.sandiego.gov/police/data-transparency/crime-statistics",
+    "description": "Official San Diego Police Department crime statistics and mapping links"
+  },
+  {
+    "name": "news-report",
+    "display_name": "Alert San Diego updates",
+    "protocol": "https",
+    "url": "https://www.alertsandiego.org/en-us/updates.html",
+    "description": "Official County of San Diego emergency updates"
+  },
+  {
+    "name": "environmental-factors",
+    "display_name": "San Diego Environmental Services",
+    "protocol": "https",
+    "url": "https://www.sandiego.gov/environmental-services",
+    "description": "Official City environmental services and public information"
+  },
+  {
+    "name": "emergency-alerts",
+    "display_name": "Alert San Diego",
+    "protocol": "https",
+    "url": "https://www.alertsandiego.org/en-us/",
+    "description": "Official County emergency information, alerts, maps, and preparedness resources"
+  },
+  {
+    "name": "netnut-report",
+    "display_name": "BleepingComputer NetNut report",
+    "protocol": "https",
+    "url": "https://www.bleepingcomputer.com/news/security/netnut-proxy-network-disrupted-2-million-infected-devices-cut-off/",
+    "description": "Background report about the disrupted NetNut residential proxy network"
+  },
+  {
+    "name": "bbs",
+    "display_name": "Local BBS",
+    "protocol": "http",
+    "url": "http://192.168.5.215:8090/",
+    "description": "Local Synchronet BBS"
+  }
+]
