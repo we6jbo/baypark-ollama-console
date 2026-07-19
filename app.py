@@ -25,7 +25,8 @@ APP_DIR = Path('/opt/baypark-ollama-console')
 APP_PATH = APP_DIR / 'app.py'
 CONFIG_PATH = APP_DIR / 'config.json'
 ADVENTURE_STATE_PATH = APP_DIR / 'adventure_state.json'
-APP_VERSION = '7.606.0'
+PERMISSION_REPAIR_LOG_PATH = APP_DIR / 'update-permission-repair.log'
+APP_VERSION = '7.607.0'
 MAX_FETCH_BYTES = 160000
 FETCH_TIMEOUT = 10
 RESTART_REQUESTED = False
@@ -488,6 +489,74 @@ def system_status_text():
     )
 
 
+def permission_repair_log_text(max_lines=80):
+    """Summarize the local permission self-repair event log."""
+    path = PERMISSION_REPAIR_LOG_PATH
+    if not path.exists():
+        return (
+            f"No permission-repair event log exists yet at {path}.\n"
+            "That usually means the repair service has not needed to fix anything, "
+            "or the service has not created the log yet."
+        )
+    try:
+        raw_lines = path.read_text(errors='replace').splitlines()
+    except PermissionError:
+        return (
+            f"The log exists at {path}, but Network Assistant AI cannot read it. "
+            "Run: sudo chown pi:pi " + str(path) + " && sudo chmod 664 " + str(path)
+        )
+    except Exception as exc:
+        return f"Could not read {path}: {type(exc).__name__}: {exc}"
+
+    lines = [line.strip() for line in raw_lines if line.strip()]
+    if not lines:
+        return f"The permission-repair log exists at {path}, but it is empty."
+
+    recent = lines[-max_lines:]
+    owner_repairs = sum('Repaired owner' in line for line in recent)
+    mode_repairs = sum('Repaired mode' in line for line in recent)
+    completions = sum('completed successfully' in line.lower() for line in recent)
+    failures = [line for line in recent if re.search(r'fail|error|cannot|unsuccessful', line, re.I)]
+
+    latest = recent[-1]
+    if failures:
+        condition = 'The log contains a possible failure or warning that should be reviewed.'
+    elif owner_repairs or mode_repairs:
+        condition = 'The service detected incorrect ownership or permissions and repaired them.'
+    elif completions:
+        condition = 'The latest recorded repair completed successfully.'
+    else:
+        condition = 'The log contains informational events, with no obvious failure detected.'
+
+    excerpt = '\n'.join(recent[-20:])
+    return (
+        "Permission self-repair log summary:\n"
+        f"Log file: {path}\n"
+        f"Events examined: {len(recent)}"
+        + (f" of {len(lines)} total" if len(lines) > len(recent) else '') + "\n"
+        f"Ownership repairs: {owner_repairs}\n"
+        f"Mode repairs: {mode_repairs}\n"
+        f"Successful completion records: {completions}\n"
+        f"Possible warning/failure records: {len(failures)}\n"
+        f"Current interpretation: {condition}\n"
+        f"Latest event: {latest}\n\n"
+        "Most recent log entries:\n" + excerpt
+    )
+
+
+def github_update_help_text():
+    return (
+        "To engage the GitHub updater, enter: check updates\n\n"
+        "The updater also runs automatically when Network Assistant AI does not recognize a command, "
+        "when a requested saved source is missing, or when a movement direction has no room. "
+        "For a deliberate test, enter an obviously unsupported command such as: github update trigger test\n\n"
+        "Repository: https://github.com/" + str(CONFIG.get('github_repo')) + "\n"
+        "Branch: " + str(CONFIG.get('github_branch')) + "\n"
+        "After app.py is installed, the program requests a restart. Wait a few seconds, refresh the page, "
+        "and enter: version"
+    )
+
+
 def answer(prompt):
     text = prompt.strip()
     low = re.sub(r'\s+', ' ', text.lower())
@@ -505,6 +574,11 @@ def answer(prompt):
 
     if low in {'test github update', 'github update test', 'update test'}:
         return 'GitHub update test passed. This command exists only in version 7.606.0 or newer.', clickable_links_html()
+
+    if low in {'permission repair log', 'repair log', 'permission log', 'update permission log', 'read repair log', 'show repair log'}:
+        return permission_repair_log_text(), clickable_links_html()
+    if low in {'update help', 'github update help', 'how to update', 'how do i update', 'engage github update', 'trigger github update'}:
+        return github_update_help_text(), clickable_links_html()
 
     if low in {'version', 'what version', 'version number'} or 'version number' in low:
         return f"Current version: {APP_VERSION}\nRepository: https://github.com/{CONFIG.get('github_repo')}\nBranch: {CONFIG.get('github_branch')}", clickable_links_html()
@@ -536,7 +610,7 @@ def answer(prompt):
     update_message, changed = check_github_updates()
     normal = (
         'I am Network Assistant AI. Try:\n'
-        '- version\n- check updates\n- check netnut\n- local links\n- simple check\n'
+        '- version\n- check updates\n- update help\n- permission repair log\n- check netnut\n- local links\n- simple check\n'
         '- system status\n- list sources\n- fetch example\n- fetch crime report\n'
         '- fetch power outages\n- fetch news report\n- fetch environmental factors\n'
         '- look\n- open mailbox\n- take leaflet\n- inventory\n- reset game\n'
@@ -619,7 +693,7 @@ function askPreset(q){{document.getElementById('prompt').value=q;document.getEle
 <button type="button" onclick="askPreset('look')">Look</button></form></div>
 <div class="card"><h2>Answer</h2><button onclick="copyAnswer()">Copy answer</button> <span id="copymsg" class="small"></span>
 <pre id="answerbox">{esc(reply)}</pre><div>{links}</div></div>
-<div class="card small">Commands: version. check updates. check netnut. local links. simple check. system status. list sources. fetch example. fetch crime report. fetch power outages. fetch news report. fetch environmental factors. look. open mailbox. take leaflet. inventory. reset game. north. south. east. west.</div>
+<div class="card small">Commands: version. check updates. update help. permission repair log. check netnut. local links. simple check. system status. list sources. fetch example. fetch crime report. fetch power outages. fetch news report. fetch environmental factors. look. open mailbox. take leaflet. inventory. reset game. north. south. east. west.</div>
 </body></html>'''
         self.send_body(page)
 
