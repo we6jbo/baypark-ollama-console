@@ -18,7 +18,7 @@ import tkinter as tk
 from tkinter import messagebox, simpledialog, ttk
 from tkinter.scrolledtext import ScrolledText
 
-MAAAZERUNNER_VERSION = '2026.07.20.3'
+MAAAZERUNNER_VERSION = '2026.07.20.4'
 
 HOME = Path('/home/we6jbo')
 PROJECT = Path('/opt/baypark-ollama-console')
@@ -40,7 +40,7 @@ TOOL_COPY = PROJECT / 'tools/maaazerunner.py'
 TOOLS_README = PROJECT / 'tools/README.md'
 PROTECTED_APP_COPY = DRAFT_DIR / 'protected-app.py'
 APP_GUARD_LOG = DRAFT_DIR / 'app-guard.log'
-APP_PROTECTED_SHA256 = '1cf01ebd24f3a22b559ed54873730c997a29f5f2c8be929c4f393bb748ccb40b'
+APP_PROTECTED_SHA256 = '4ec21f82628fb434d21d26ab63849c410e16d015fca73fd74bea8848c582e8f4'
 SYSTEMD_USER_DIR = HOME / '.config/systemd/user'
 SCHEDULE_SERVICE = SYSTEMD_USER_DIR / 'maaazerunner-publish.service'
 SCHEDULE_TIMER = SYSTEMD_USER_DIR / 'maaazerunner-publish.timer'
@@ -62,7 +62,9 @@ MaaazeRunner is a graphical adventure and known-answer builder for the Bay Park
 Ollama Console project. It can add and edit rooms, items, puzzles, and
 prepopulated Decision Tree answers; import and export complete repair bundles;
 validate generated data; and publish approved generated files to GitHub on a
-schedule.
+schedule. Scheduled runs automatically pull the latest main branch, validate the generated output, commit approved changes, and push them to GitHub.
+
+The built-in world also includes The Reflect Room, which records lessons learned from the app-development and recovery exercise.
 
 For safety, MaaazeRunner does not modify or stage `app.py`. An automatic guard
 checks the protected `app.py` checksum and restores the verified copy if another
@@ -217,11 +219,29 @@ DEFAULT_WORLD = {
         'treasure_vault': {
             'name': 'Five-Treasure Vault',
             'description': 'Five recesses surround a stone chest.',
-            'story': 'Bring all five treasures here to win.',
-            'exits': {'west': 'neanderthal_gallery'},
+            'story': 'Bring all five treasures here to win. A quiet doorway to the north leads to a place for reflection.',
+            'exits': {'west': 'neanderthal_gallery', 'north': 'reflect_room'},
             'locked_exits': {},
             'items': ['carved_bone'],
             'tags': ['win_room'],
+            'dark': False,
+        },
+        'reflect_room': {
+            'name': 'The Reflect Room',
+            'description': 'A calm room holds a workbench, a terminal, backup notes, and a mirror-like wall.',
+            'story': (
+                'This room remembers the lessons learned while building and repairing the app: '
+                'keep one authoritative Git repository; protect app.py from automatic rewriting; '
+                'separate application releases from generated room and answer data; make backups '
+                'before changes; validate Python and JSON before publishing; compare checksums; '
+                'test on the T14 before deploying to the Raspberry Pi; keep runtime files out of '
+                'Git; and let automatic jobs stop safely when the working tree is not clean. '
+                'The strongest update process is careful, reversible, documented, and tested.'
+            ),
+            'exits': {'south': 'treasure_vault'},
+            'locked_exits': {},
+            'items': [],
+            'tags': ['reflection', 'lessons_learned'],
             'dark': False,
         },
     },
@@ -568,6 +588,54 @@ def app_guard() -> int:
         with APP_GUARD_LOG.open('a', encoding='utf-8') as handle:
             handle.write(f'[{timestamp}] APP GUARD FAILURE\n{traceback.format_exc()}\n')
         return 1
+
+
+def ensure_reflect_room(world: dict) -> bool:
+    """Add the Reflect Room without erasing user-created content."""
+    rooms = world.setdefault('rooms', {})
+    changed = False
+
+    reflect_room = {
+        'name': 'The Reflect Room',
+        'description': (
+            'A calm room holds a workbench, a terminal, backup notes, '
+            'and a mirror-like wall.'
+        ),
+        'story': (
+            'This room remembers the lessons learned while building and repairing '
+            'the app: keep one authoritative Git repository; protect app.py from '
+            'automatic rewriting; separate application releases from generated '
+            'room and answer data; make backups before changes; validate Python '
+            'and JSON before publishing; compare checksums; test on the T14 before '
+            'deploying to the Raspberry Pi; keep runtime files out of Git; and let '
+            'automatic jobs stop safely when the working tree is not clean. The '
+            'strongest update process is careful, reversible, documented, and tested.'
+        ),
+        'exits': {'south': 'treasure_vault'},
+        'locked_exits': {},
+        'items': [],
+        'tags': ['reflection', 'lessons_learned'],
+        'dark': False,
+    }
+
+    if 'reflect_room' not in rooms:
+        rooms['reflect_room'] = reflect_room
+        changed = True
+    else:
+        current = rooms['reflect_room']
+        for key, value in reflect_room.items():
+            if key not in current or current[key] in ('', None, [], {}):
+                current[key] = json.loads(json.dumps(value))
+                changed = True
+
+    vault = rooms.get('treasure_vault')
+    if isinstance(vault, dict):
+        exits = vault.setdefault('exits', {})
+        if 'north' not in exits:
+            exits['north'] = 'reflect_room'
+            changed = True
+
+    return changed
 
 def validate(world: dict) -> list[str]:
     errors = []
@@ -998,14 +1066,16 @@ WorkingDirectory={PROJECT}
 ExecStart=/usr/bin/python3 {SCRIPT_PATH} --scheduled-publish
 """
     timer = """[Unit]
-Description=Run MaaazeRunner publishing five times daily
+Description=Run MaaazeRunner publishing seven times daily outside the protected blackout
 
 [Timer]
-OnCalendar=*-*-* 00:57:00
-OnCalendar=*-*-* 06:00:00
-OnCalendar=*-*-* 16:30:00
-OnCalendar=*-*-* 19:30:00
-OnCalendar=*-*-* 23:13:00
+OnCalendar=*-*-* 01:45:00
+OnCalendar=*-*-* 05:45:00
+OnCalendar=*-*-* 06:55:00
+OnCalendar=*-*-* 15:40:00
+OnCalendar=*-*-* 19:00:00
+OnCalendar=*-*-* 22:00:00
+OnCalendar=*-*-* 23:18:00
 Persistent=true
 Unit=maaazerunner-publish.service
 
@@ -1080,16 +1150,16 @@ def remove_schedule_files() -> None:
 def scheduled_publish() -> int:
     DRAFT_DIR.mkdir(parents=True, exist_ok=True)
 
-    # Scheduled GitHub automation is prohibited from 07:00 through 15:20
+    # Scheduled GitHub automation is prohibited from 07:00 through 15:30
     # local time. This also blocks Persistent=true catch-up runs after boot.
     now = datetime.now()
     minutes_now = now.hour * 60 + now.minute
     blackout_start = 7 * 60
-    blackout_end = 15 * 60 + 20
+    blackout_end = 15 * 60 + 30
     if blackout_start <= minutes_now <= blackout_end:
         result = (
             'Scheduled publish skipped because the local time falls inside '
-            'the protected 07:00-15:20 GitHub automation blackout.\n'
+            'the protected 07:00-15:30 GitHub automation blackout.\n'
             f'Current local time: {now.isoformat(timespec="seconds")}\n\n'
             f'{NETWORK_ASSISTANT_STEPS}'
         )
@@ -1116,6 +1186,8 @@ def scheduled_publish() -> int:
             answers = json.loads(ANSWERS.read_text(encoding='utf-8'))
         else:
             answers = json.loads(json.dumps(DEFAULT_ANSWERS))
+
+        ensure_reflect_room(world)
 
         # Save the exact payload used by the scheduler so later GUI sessions
         # and support exports reproduce the same content.
@@ -1158,10 +1230,13 @@ class Builder:
                 try:
                     value = json.loads(path.read_text(encoding='utf-8'))
                     if isinstance(value, dict):
+                        ensure_reflect_room(value)
                         return value
                 except Exception:
                     pass
-        return json.loads(json.dumps(DEFAULT_WORLD))
+        value = json.loads(json.dumps(DEFAULT_WORLD))
+        ensure_reflect_room(value)
+        return value
 
     def load_answers(self) -> dict:
         for path in (ANSWERS_DRAFT, ANSWERS):
@@ -1362,7 +1437,7 @@ class Builder:
     def make_schedule(self) -> None:
         ttk.Label(
             self.schedule_tab,
-            text='Automatic GitHub publishing times: 12:57 AM, 6:00 AM, 4:30 PM, 7:30 PM, and 11:13 PM. app.py is protected and never published by MaaazeRunner.',
+            text='Automatic GitHub publishing times: 1:45 AM, 5:45 AM, 6:55 AM, 3:40 PM, 7:00 PM, 10:00 PM, and 11:18 PM. Publishing is blocked from 7:00 AM through 3:30 PM. Each run pulls GitHub, validates generated files, commits changes, and pushes them to the GitHub server. app.py is protected and never published by MaaazeRunner.',
             wraplength=900,
         ).pack(anchor='w', pady=(0, 8))
         controls = ttk.Frame(self.schedule_tab)

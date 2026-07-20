@@ -212,6 +212,21 @@
         "neanderthal_fact"
       ]
     },
+    "reflect_room": {
+      "dark": false,
+      "description": "A calm room holds a workbench, a terminal, backup notes, and a mirror-like wall.",
+      "exits": {
+        "south": "treasure_vault"
+      },
+      "items": [],
+      "locked_exits": {},
+      "name": "The Reflect Room",
+      "story": "This room remembers the lessons learned while building and repairing the app: keep one authoritative Git repository; protect app.py from automatic rewriting; separate application releases from generated room and answer data; make backups before changes; validate Python and JSON before publishing; compare checksums; test on the T14 before deploying to the Raspberry Pi; keep runtime files out of Git; and let automatic jobs stop safely when the working tree is not clean. The strongest update process is careful, reversible, documented, and tested.",
+      "tags": [
+        "reflection",
+        "lessons_learned"
+      ]
+    },
     "sunlit_courtyard": {
       "dark": false,
       "description": "A diamond rests in direct sunlight.",
@@ -251,6 +266,7 @@
       "dark": false,
       "description": "Five recesses surround a stone chest.",
       "exits": {
+        "north": "reflect_room",
         "west": "neanderthal_gallery"
       },
       "items": [
