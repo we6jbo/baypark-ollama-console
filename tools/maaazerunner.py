@@ -18,7 +18,7 @@ import tkinter as tk
 from tkinter import messagebox, simpledialog, ttk
 from tkinter.scrolledtext import ScrolledText
 
-MAAAZERUNNER_VERSION = '2026.07.20.2'
+MAAAZERUNNER_VERSION = '2026.07.20.3'
 
 HOME = Path('/home/we6jbo')
 PROJECT = Path('/opt/baypark-ollama-console')
@@ -37,9 +37,15 @@ LOG_FILE = DRAFT_DIR / 'scheduled-publish.log'
 LAST_RESULT = DRAFT_DIR / 'last-publish-result.txt'
 SCRIPT_PATH = HOME / 'maaazerunner.py'
 TOOL_COPY = PROJECT / 'tools/maaazerunner.py'
+TOOLS_README = PROJECT / 'tools/README.md'
+PROTECTED_APP_COPY = DRAFT_DIR / 'protected-app.py'
+APP_GUARD_LOG = DRAFT_DIR / 'app-guard.log'
+APP_PROTECTED_SHA256 = '1cf01ebd24f3a22b559ed54873730c997a29f5f2c8be929c4f393bb748ccb40b'
 SYSTEMD_USER_DIR = HOME / '.config/systemd/user'
 SCHEDULE_SERVICE = SYSTEMD_USER_DIR / 'maaazerunner-publish.service'
 SCHEDULE_TIMER = SYSTEMD_USER_DIR / 'maaazerunner-publish.timer'
+APP_GUARD_SERVICE = SYSTEMD_USER_DIR / 'maaazerunner-app-guard.service'
+APP_GUARD_TIMER = SYSTEMD_USER_DIR / 'maaazerunner-app-guard.timer'
 NETWORK_ASSISTANT_URL = 'http://192.168.5.215/'
 NETWORK_ASSISTANT_STEPS = (
     'Open http://192.168.5.215/ and enter: check updates. '
@@ -48,6 +54,29 @@ NETWORK_ASSISTANT_STEPS = (
 THANKS_TEXT = 'I, Jeremiah, thank you ChatGPT for helping me with this.'
 AUTOSTART = HOME / '.config/autostart/maaazerunner.desktop'
 AUTOSTART_MD5 = '7b040c10cb62c5ecb4ddce554ac8a28e'
+
+
+TOOLS_README_TEXT = '''# MaaazeRunner
+
+MaaazeRunner is a graphical adventure and known-answer builder for the Bay Park
+Ollama Console project. It can add and edit rooms, items, puzzles, and
+prepopulated Decision Tree answers; import and export complete repair bundles;
+validate generated data; and publish approved generated files to GitHub on a
+schedule.
+
+For safety, MaaazeRunner does not modify or stage `app.py`. An automatic guard
+checks the protected `app.py` checksum and restores the verified copy if another
+T14 script changes it.
+
+Created July 20, 2026 by Jeremiah O'Neal.
+
+For more information, visit https://j03.page/
+
+## License
+
+This program is free software licensed under the GNU General Public License,
+version 3 (GPLv3). You may redistribute and modify it under the terms of GPLv3.
+'''
 
 TREASURES = [
     'amber_bear',
@@ -486,6 +515,60 @@ def md5(path: Path) -> str:
             digest.update(chunk)
     return digest.hexdigest()
 
+
+def sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open('rb') as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def ensure_app_protection_baseline() -> None:
+    DRAFT_DIR.mkdir(parents=True, exist_ok=True)
+    if not APP.exists():
+        raise RuntimeError(f'Cannot protect missing app.py: {APP}')
+    actual = sha256(APP)
+    if actual != APP_PROTECTED_SHA256:
+        raise RuntimeError(
+            'Refusing to establish app.py protection because the live T14 copy '
+            'is not the verified stable version.\n'
+            f'Expected: {APP_PROTECTED_SHA256}\nActual:   {actual}'
+        )
+    write_atomic(PROTECTED_APP_COPY, APP.read_text(encoding='utf-8'), 0o600)
+
+
+def app_guard() -> int:
+    DRAFT_DIR.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().isoformat(timespec='seconds')
+    try:
+        if not PROTECTED_APP_COPY.exists():
+            ensure_app_protection_baseline()
+        protected_hash = sha256(PROTECTED_APP_COPY)
+        if protected_hash != APP_PROTECTED_SHA256:
+            raise RuntimeError(
+                'Protected app.py baseline checksum is invalid. '
+                f'Expected {APP_PROTECTED_SHA256}; found {protected_hash}.'
+            )
+        live_hash = sha256(APP) if APP.exists() else 'missing'
+        if live_hash != APP_PROTECTED_SHA256:
+            write_atomic(APP, PROTECTED_APP_COPY.read_text(encoding='utf-8'), 0o644)
+            restored_hash = sha256(APP)
+            if restored_hash != APP_PROTECTED_SHA256:
+                raise RuntimeError('Automatic app.py restoration did not verify.')
+            message = (
+                f'[{timestamp}] Restored protected app.py after detecting '
+                f'checksum {live_hash}.\n'
+            )
+            with APP_GUARD_LOG.open('a', encoding='utf-8') as handle:
+                handle.write(message)
+            _notify_user('MaaazeRunner protected app.py', 'A changed app.py was restored automatically.')
+        return 0
+    except Exception:
+        with APP_GUARD_LOG.open('a', encoding='utf-8') as handle:
+            handle.write(f'[{timestamp}] APP GUARD FAILURE\n{traceback.format_exc()}\n')
+        return 1
+
 def validate(world: dict) -> list[str]:
     errors = []
     rooms = world.get('rooms', {})
@@ -772,7 +855,6 @@ def publish_payload(
     world: dict,
     answers_data: dict,
     *,
-    hook_app: bool,
     commit_message: str,
 ) -> str:
     errors = validate(world) + validate_answers_data(answers_data)
@@ -780,21 +862,30 @@ def publish_payload(
         raise RuntimeError('Validation failed:\n' + '\n'.join('• ' + item for item in errors))
     if not (PROJECT / '.git').is_dir():
         raise RuntimeError(f'{PROJECT} is not a Git working tree.')
-    if not APP.exists():
-        raise RuntimeError(f'The verified latest app.py is missing: {APP}')
+
+    # app.py is protected and is never a MaaazeRunner output.
+    ensure_app_protection_baseline()
+    app_hash_before = sha256(APP)
 
     porcelain = _git('status', '--porcelain').stdout.strip()
-    if porcelain:
+    allowed_cache = tuple(
+        line for line in porcelain.splitlines()
+        if '__pycache__/' not in line and not line.endswith('.pyc')
+    )
+    if allowed_cache:
         raise RuntimeError(
             'The Git working tree is not clean. Commit, stash, or remove unrelated '
-            'changes before publishing:\n' + porcelain
+            'changes before publishing:\n' + '\n'.join(allowed_cache)
         )
 
     _git('pull', '--ff-only', 'origin', 'main')
+    if sha256(APP) != APP_PROTECTED_SHA256:
+        app_guard()
+        raise RuntimeError(
+            'A Git pull attempted to change app.py. The protected version was '
+            'restored and publishing stopped. Review the remote commit manually.'
+        )
 
-    # Never let an older running MaaazeRunner overwrite a newer copy that was
-    # already pulled from GitHub. Older repository copies without this version
-    # marker are treated as version 0 and can be upgraded safely.
     if TOOL_COPY.exists():
         repo_source = TOOL_COPY.read_text(encoding='utf-8')
         match = re.search(
@@ -806,8 +897,7 @@ def publish_payload(
             raise RuntimeError(
                 'GitHub contains a newer MaaazeRunner than the running copy. '
                 f'Repository version: {repo_version}; running version: '
-                f'{MAAAZERUNNER_VERSION}. Copy tools/maaazerunner.py to '
-                f'{SCRIPT_PATH}, compile it, and run the schedule again.'
+                f'{MAAAZERUNNER_VERSION}.'
             )
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -818,11 +908,14 @@ def publish_payload(
     engine_text = ENGINE_SOURCE
     answers_text = _json_text(answers_data)
     script_text = SCRIPT_PATH.read_text(encoding='utf-8')
+    readme_text = TOOLS_README_TEXT.rstrip() + '\n'
+
     data_changed = any((
         _file_would_change(WORLD, world_text),
         _file_would_change(ENGINE, engine_text),
         _file_would_change(ANSWERS, answers_text),
         _file_would_change(TOOL_COPY, script_text),
+        _file_would_change(TOOLS_README, readme_text),
     ))
 
     if not data_changed:
@@ -830,7 +923,7 @@ def publish_payload(
         write_atomic(LAST_RESULT, result + '\n', 0o600)
         return result
 
-    for path in (APP, WORLD, ENGINE, ANSWERS, TOOL_COPY):
+    for path in (WORLD, ENGINE, ANSWERS, TOOL_COPY, TOOLS_README):
         if path.exists():
             backup_name = path.name if path != TOOL_COPY else 'tools-maaazerunner.py'
             shutil.copy2(path, BACKUPS / f'{backup_name}.{stamp}.bak')
@@ -839,23 +932,20 @@ def publish_payload(
     write_atomic(ENGINE, engine_text)
     write_atomic(ANSWERS, answers_text)
     write_atomic(TOOL_COPY, script_text, 0o755)
+    write_atomic(TOOLS_README, readme_text, 0o644)
+
     subprocess.run(
-        [sys.executable, '-m', 'py_compile', str(ENGINE)],
+        [sys.executable, '-m', 'py_compile', str(ENGINE), str(TOOL_COPY)],
         check=True,
         text=True,
         capture_output=True,
     )
 
-    note = 'app.py was preserved without modification.'
-    if hook_app:
-        latest_source = APP.read_text(encoding='utf-8')
-        updated, note = patch_app(latest_source, bump_version=True)
-        write_atomic(APP, updated)
-        subprocess.run(
-            [sys.executable, '-m', 'py_compile', str(APP)],
-            check=True,
-            text=True,
-            capture_output=True,
+    if sha256(APP) != app_hash_before or sha256(APP) != APP_PROTECTED_SHA256:
+        app_guard()
+        raise RuntimeError(
+            'app.py changed during publishing. It was restored and the publish '
+            'was cancelled.'
         )
 
     relative_files = [
@@ -863,11 +953,16 @@ def publish_payload(
         str(ENGINE.relative_to(PROJECT)),
         str(ANSWERS.relative_to(PROJECT)),
         str(TOOL_COPY.relative_to(PROJECT)),
+        str(TOOLS_README.relative_to(PROJECT)),
     ]
-    if hook_app:
-        relative_files.append(str(APP.relative_to(PROJECT)))
-
     _git('add', '--', *relative_files)
+
+    staged_names = _git('diff', '--cached', '--name-only').stdout.splitlines()
+    if 'app.py' in staged_names:
+        _git('reset', '--', 'app.py', check=False)
+        app_guard()
+        raise RuntimeError('Safety check blocked app.py from the Git commit.')
+
     staged = _git('diff', '--cached', '--name-status').stdout.strip()
     if not staged:
         result = 'Generated files already matched Git. No commit was created.'
@@ -880,7 +975,8 @@ def publish_payload(
 
     result = (
         f'Published successfully at {datetime.now().isoformat(timespec="seconds")}.\n'
-        f'{note}\nStaged and pushed:\n{staged}\n\n{NETWORK_ASSISTANT_STEPS}'
+        'app.py was protected and was not modified or staged.\n'
+        f'Staged and pushed:\n{staged}\n\n{NETWORK_ASSISTANT_STEPS}'
     )
     write_atomic(LAST_RESULT, result + '\n', 0o600)
     _notify_user('MaaazeRunner published', NETWORK_ASSISTANT_STEPS)
@@ -889,7 +985,9 @@ def publish_payload(
 
 def install_schedule_files() -> None:
     SYSTEMD_USER_DIR.mkdir(parents=True, exist_ok=True)
-    service = f'''[Unit]
+    ensure_app_protection_baseline()
+
+    service = f"""[Unit]
 Description=MaaazeRunner scheduled GitHub publisher
 After=network-online.target
 Wants=network-online.target
@@ -898,37 +996,84 @@ Wants=network-online.target
 Type=oneshot
 WorkingDirectory={PROJECT}
 ExecStart=/usr/bin/python3 {SCRIPT_PATH} --scheduled-publish
-'''
-    timer = '''[Unit]
-Description=Run MaaazeRunner publishing four times daily outside the daytime blackout
+"""
+    timer = """[Unit]
+Description=Run MaaazeRunner publishing five times daily
 
 [Timer]
-OnCalendar=*-*-* 00:05:00
-OnCalendar=*-*-* 15:30:00
-OnCalendar=*-*-* 17:30:00
-OnCalendar=*-*-* 19:40:00
+OnCalendar=*-*-* 00:57:00
+OnCalendar=*-*-* 06:00:00
+OnCalendar=*-*-* 16:30:00
+OnCalendar=*-*-* 19:30:00
+OnCalendar=*-*-* 23:13:00
 Persistent=true
 Unit=maaazerunner-publish.service
 
 [Install]
 WantedBy=timers.target
-'''
+"""
+    guard_service = f"""[Unit]
+Description=Protect verified Bay Park app.py from T14 scripts
+
+[Service]
+Type=oneshot
+WorkingDirectory={PROJECT}
+ExecStart=/usr/bin/python3 {SCRIPT_PATH} --app-guard
+"""
+    guard_timer = """[Unit]
+Description=Check protected app.py every minute
+
+[Timer]
+OnBootSec=30
+OnUnitActiveSec=60
+Persistent=true
+Unit=maaazerunner-app-guard.service
+
+[Install]
+WantedBy=timers.target
+"""
     write_atomic(SCHEDULE_SERVICE, service, 0o644)
     write_atomic(SCHEDULE_TIMER, timer, 0o644)
+    write_atomic(APP_GUARD_SERVICE, guard_service, 0o644)
+    write_atomic(APP_GUARD_TIMER, guard_timer, 0o644)
+
+    hooks = PROJECT / '.git/hooks'
+    hooks.mkdir(parents=True, exist_ok=True)
+    pre_commit = hooks / 'pre-commit'
+    write_atomic(
+        pre_commit,
+        """#!/usr/bin/env bash
+set -e
+if git diff --cached --name-only | grep -qx 'app.py'; then
+    echo 'Blocked: app.py is protected and cannot be committed by T14 automation.' >&2
+    exit 1
+fi
+""",
+        0o755,
+    )
+
     subprocess.run(['systemctl', '--user', 'daemon-reload'], check=True)
     subprocess.run(
-        ['systemctl', '--user', 'enable', '--now', SCHEDULE_TIMER.name],
+        ['systemctl', '--user', 'enable', '--now', SCHEDULE_TIMER.name, APP_GUARD_TIMER.name],
         check=True,
     )
 
 
 def remove_schedule_files() -> None:
     subprocess.run(
-        ['systemctl', '--user', 'disable', '--now', SCHEDULE_TIMER.name],
+        [
+            'systemctl', '--user', 'disable', '--now',
+            SCHEDULE_TIMER.name, APP_GUARD_TIMER.name,
+        ],
         check=False,
     )
-    SCHEDULE_SERVICE.unlink(missing_ok=True)
-    SCHEDULE_TIMER.unlink(missing_ok=True)
+    for path in (
+        SCHEDULE_SERVICE,
+        SCHEDULE_TIMER,
+        APP_GUARD_SERVICE,
+        APP_GUARD_TIMER,
+    ):
+        path.unlink(missing_ok=True)
     subprocess.run(['systemctl', '--user', 'daemon-reload'], check=False)
 
 
@@ -979,7 +1124,6 @@ def scheduled_publish() -> int:
         result = publish_payload(
             world,
             answers,
-            hook_app=True,
             commit_message='Scheduled MaaazeRunner adventure update',
         )
         with LOG_FILE.open('a', encoding='utf-8') as handle:
@@ -1002,7 +1146,6 @@ class Builder:
         self.world = self.load_world()
         self.answers_data = self.load_answers()
         self.status = tk.StringVar(value='Ready.')
-        self.hook = tk.BooleanVar(value=True)
         self.make_ui()
         self.refresh_lists()
         self.refresh_answer_list()
@@ -1066,7 +1209,6 @@ class Builder:
         self.make_schedule()
         self.make_thanks()
         self.make_validation()
-        ttk.Checkbutton(top, text='Hook generated engine into app.py', variable=self.hook).pack(side='left', padx=12)
         ttk.Label(self.root, textvariable=self.status, relief='sunken', anchor='w').pack(fill='x', padx=6, pady=4)
 
     def make_rooms(self) -> None:
@@ -1220,7 +1362,7 @@ class Builder:
     def make_schedule(self) -> None:
         ttk.Label(
             self.schedule_tab,
-            text='Automatic GitHub publishing times: 12:05 AM, 10:00 AM, 3:30 PM, and 7:40 PM.',
+            text='Automatic GitHub publishing times: 12:57 AM, 6:00 AM, 4:30 PM, 7:30 PM, and 11:13 PM. app.py is protected and never published by MaaazeRunner.',
             wraplength=900,
         ).pack(anchor='w', pady=(0, 8))
         controls = ttk.Frame(self.schedule_tab)
@@ -1710,7 +1852,6 @@ class Builder:
             result = publish_payload(
                 self.world,
                 self.answers_data,
-                hook_app=self.hook.get(),
                 commit_message=message,
             )
             self.refresh_schedule_status()
@@ -1726,6 +1867,7 @@ def main() -> None:
     parser.add_argument('--scheduled-publish', action='store_true')
     parser.add_argument('--install-schedule', action='store_true')
     parser.add_argument('--remove-schedule', action='store_true')
+    parser.add_argument('--app-guard', action='store_true')
     args = parser.parse_args()
 
     if args.install_schedule:
@@ -1736,6 +1878,8 @@ def main() -> None:
         remove_schedule_files()
         print('MaaazeRunner schedule removed.')
         return
+    if args.app_guard:
+        raise SystemExit(app_guard())
     if args.scheduled_publish:
         raise SystemExit(scheduled_publish())
 
