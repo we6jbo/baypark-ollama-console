@@ -1,0 +1,277 @@
+{
+  "button_sequence": [
+    "blue",
+    "amber",
+    "green"
+  ],
+  "diamond_clue": "Look at the diamond in the sun: blue, amber, then green.",
+  "items": {
+    "amber_bear": {
+      "description": "A carved amber bear.",
+      "name": "amber bear",
+      "portable": true,
+      "tags": [
+        "treasure"
+      ],
+      "treasure": true
+    },
+    "carved_bone": {
+      "description": "An incised bone object.",
+      "name": "carved bone",
+      "portable": true,
+      "tags": [
+        "treasure",
+        "neanderthal"
+      ],
+      "treasure": true
+    },
+    "door_rug": {
+      "description": "A rug that can be placed on the trapdoor.",
+      "name": "rug",
+      "portable": true,
+      "tags": [
+        "trapdoor_rug"
+      ],
+      "treasure": false
+    },
+    "obsidian_handaxe": {
+      "description": "A ceremonial handaxe.",
+      "name": "obsidian handaxe",
+      "portable": true,
+      "tags": [
+        "treasure",
+        "neanderthal"
+      ],
+      "treasure": true
+    },
+    "rechargeable_lamp": {
+      "description": "A lamp with a limited charge.",
+      "name": "rechargeable lamp",
+      "portable": true,
+      "tags": [
+        "lamp"
+      ],
+      "treasure": false
+    },
+    "red_ochre_stone": {
+      "description": "A shaped pigment stone.",
+      "name": "red ochre stone",
+      "portable": true,
+      "tags": [
+        "treasure",
+        "neanderthal"
+      ],
+      "treasure": true
+    },
+    "shell_pendant": {
+      "description": "A pierced shell pendant.",
+      "name": "shell pendant",
+      "portable": true,
+      "tags": [
+        "treasure",
+        "neanderthal"
+      ],
+      "treasure": true
+    },
+    "sun_diamond": {
+      "description": "A diamond that reveals colored light.",
+      "name": "sun diamond",
+      "portable": true,
+      "tags": [
+        "diamond"
+      ],
+      "treasure": false
+    },
+    "torch": {
+      "description": "A flame source unsafe around gas.",
+      "name": "torch",
+      "portable": true,
+      "tags": [
+        "flame"
+      ],
+      "treasure": false
+    },
+    "wrench": {
+      "description": "A wrench for the water-wheel shutoff.",
+      "name": "wrench",
+      "portable": true,
+      "tags": [
+        "water_wheel_tool"
+      ],
+      "treasure": false
+    }
+  },
+  "lamp": {
+    "average_seconds_per_move": 18,
+    "charger_room": "lamp_workshop",
+    "item_id": "rechargeable_lamp",
+    "minimum_moves": 8,
+    "safety_multiplier": 1.45
+  },
+  "rooms": {
+    "button_hall": {
+      "dark": false,
+      "description": "Three buttons glow blue, amber, and green.",
+      "exits": {
+        "west": "mill_room"
+      },
+      "items": [],
+      "locked_exits": {
+        "east": "trapdoor_room"
+      },
+      "name": "Three-Button Hall",
+      "story": "The diamond in sunlight reveals the operating sequence.",
+      "tags": [
+        "button_puzzle"
+      ]
+    },
+    "gas_room": {
+      "dark": true,
+      "description": "Gas fills the room. A ventilation valve is nearby.",
+      "exits": {
+        "east": "lamp_workshop",
+        "up": "trapdoor_room"
+      },
+      "items": [
+        "torch",
+        "obsidian_handaxe"
+      ],
+      "locked_exits": {},
+      "name": "Smelly Room",
+      "story": "A lit torch causes a big boom unless the valve clears the gas.",
+      "tags": [
+        "gas_room",
+        "gas_valve"
+      ]
+    },
+    "lamp_workshop": {
+      "dark": false,
+      "description": "A hand-cranked station recharges the lamp.",
+      "exits": {
+        "north": "neanderthal_gallery",
+        "west": "gas_room"
+      },
+      "items": [
+        "rechargeable_lamp",
+        "shell_pendant"
+      ],
+      "locked_exits": {},
+      "name": "Lamp Workshop",
+      "story": "Lamp life is based on average travel pace and distance back to this charger.",
+      "tags": [
+        "lamp_charger"
+      ]
+    },
+    "mill_room": {
+      "dark": false,
+      "description": "A water wheel drives a dangerous shaft.",
+      "exits": {
+        "east": "button_hall",
+        "west": "sunlit_courtyard"
+      },
+      "items": [
+        "wrench"
+      ],
+      "locked_exits": {},
+      "name": "Water-Wheel Mill",
+      "story": "Use the wrench to turn off the wheel.",
+      "tags": [
+        "water_wheel"
+      ]
+    },
+    "neanderthal_gallery": {
+      "dark": false,
+      "description": "Displays cover shelters, pigments, hunting, and stone-tool traditions.",
+      "exits": {
+        "east": "treasure_vault",
+        "south": "lamp_workshop"
+      },
+      "items": [
+        "red_ochre_stone"
+      ],
+      "locked_exits": {},
+      "name": "Neanderthal Gallery",
+      "story": "Neanderthals lived across Europe and western Asia and adapted to varied climates.",
+      "tags": [
+        "neanderthal_fact"
+      ]
+    },
+    "prism_gallery": {
+      "dark": false,
+      "description": "Sunlight separates into blue, amber, and green.",
+      "exits": {
+        "south": "sunlit_courtyard"
+      },
+      "items": [
+        "amber_bear"
+      ],
+      "locked_exits": {},
+      "name": "Prism Gallery",
+      "story": "Neanderthals made sophisticated tools, used pigments, and cared for injured community members.",
+      "tags": [
+        "neanderthal_fact"
+      ]
+    },
+    "sunlit_courtyard": {
+      "dark": false,
+      "description": "A diamond rests in direct sunlight.",
+      "exits": {
+        "east": "mill_room",
+        "north": "prism_gallery"
+      },
+      "items": [
+        "sun_diamond"
+      ],
+      "locked_exits": {},
+      "name": "Sunlit Courtyard",
+      "story": "Five treasures are hidden beyond old engineering puzzles.",
+      "tags": [
+        "sunlight"
+      ]
+    },
+    "trapdoor_room": {
+      "dark": false,
+      "description": "A rug lies beside a fitted trapdoor.",
+      "exits": {
+        "west": "button_hall"
+      },
+      "items": [
+        "door_rug"
+      ],
+      "locked_exits": {
+        "down": "gas_room"
+      },
+      "name": "Rug and Trapdoor Room",
+      "story": "Place the rug, open the trapdoor, then go down.",
+      "tags": [
+        "trapdoor"
+      ]
+    },
+    "treasure_vault": {
+      "dark": false,
+      "description": "Five recesses surround a stone chest.",
+      "exits": {
+        "west": "neanderthal_gallery"
+      },
+      "items": [
+        "carved_bone"
+      ],
+      "locked_exits": {},
+      "name": "Five-Treasure Vault",
+      "story": "Bring all five treasures here to win.",
+      "tags": [
+        "win_room"
+      ]
+    }
+  },
+  "schema_version": 1,
+  "start_room": "sunlit_courtyard",
+  "title": "The Five Treasures of the Hidden Valley",
+  "win_treasures": [
+    "amber_bear",
+    "obsidian_handaxe",
+    "shell_pendant",
+    "red_ochre_stone",
+    "carved_bone"
+  ]
+}

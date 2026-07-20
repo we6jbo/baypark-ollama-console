@@ -1,0 +1,25 @@
+{
+  "answers": [
+    {
+      "answer": "The next step on the roadmap is to review the current project status, finish the highest-priority incomplete task, test that task, and document the result before adding another major feature.",
+      "enabled": true,
+      "id": "roadmap-next",
+      "questions": [
+        "whats next on the roadmap",
+        "what is next on the roadmap",
+        "what's next on the roadmap"
+      ]
+    },
+    {
+      "answer": "In Network Assistant AI, enter: check updates. After the update finishes, refresh the page and enter: version.",
+      "enabled": true,
+      "id": "check-updates",
+      "questions": [
+        "how do i check for updates",
+        "how do i update network assistant",
+        "check for updates"
+      ]
+    }
+  ],
+  "schema_version": 1
+}

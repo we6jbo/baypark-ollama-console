@@ -28,7 +28,7 @@ CONFIG_PATH = APP_DIR / 'config.json'
 ADVENTURE_STATE_PATH = APP_DIR / 'adventure_state.json'
 PERMISSION_REPAIR_LOG_PATH = APP_DIR / 'update-permission-repair.log'
 DECISION_QUEUE_DB = Path('/var/lib/baypark-decision-queue/questions.sqlite3')
-APP_VERSION = '7.609.0'
+APP_VERSION = '7.609.1'
 MAX_FETCH_BYTES = 160000
 FETCH_TIMEOUT = 10
 RESTART_REQUESTED = False
@@ -265,51 +265,11 @@ def room_description(state):
 
 
 def adventure_command(prompt):
-    state = adventure_state()
-    low = re.sub(r'\s+', ' ', prompt.lower().strip())
-    if low in {'reset game', 'reset adventure', 'restart game'}:
-        state = adventure_default()
-        save_adventure_state(state)
-        return 'Game reset. ' + room_description(state), False
-    if low in {'look', 'start game', 'play game', 'adventure'}:
-        return room_description(state), False
-    if low == 'open mailbox':
-        state['mailbox_open'] = True
-        save_adventure_state(state)
-        return 'Opening the small mailbox reveals a leaflet.' if not state['leaflet_taken'] else 'You open the mailbox. It is empty.', False
-    if low in {'take leaflet', 'get leaflet', 'read leaflet'}:
-        if not state['mailbox_open']:
-            return 'The mailbox is closed.', False
-        if not state['leaflet_taken']:
-            state['leaflet_taken'] = True
-            if 'leaflet' not in state['inventory']:
-                state['inventory'].append('leaflet')
-            save_adventure_state(state)
-        return "The leaflet says: Try 'system status', 'simple check', 'list sources', 'fetch power outages', or 'check netnut'.", False
-    if low in {'inventory', 'inv', 'i'}:
-        return 'Inventory: ' + (', '.join(state['inventory']) if state['inventory'] else 'empty'), False
-    directions = {'north', 'south', 'east', 'west', 'n', 's', 'e', 'w', 'go north', 'go south', 'go east', 'go west'}
-    if low in directions:
-        direction = low.split()[-1]
-        direction = {'n': 'north', 's': 'south', 'e': 'east', 'w': 'west'}.get(direction, direction)
-        if state['location'] == 'west_of_house' and direction == 'north':
-            state['location'] = 'north_path'
-            save_adventure_state(state)
-            return 'You walk north onto a newly downloaded path. ' + room_description(state), False
-        if state['location'] == 'north_path' and direction == 'south':
-            state['location'] = 'west_of_house'
-            save_adventure_state(state)
-            return 'You return south to the house. ' + room_description(state), False
-        if state['location'] == 'west_of_house' and direction == 'east':
-            state['location'] = 'inside_house'
-            save_adventure_state(state)
-            return 'You enter the house. ' + room_description(state), False
-        if state['location'] == 'inside_house' and direction == 'west':
-            state['location'] = 'west_of_house'
-            save_adventure_state(state)
-            return 'You leave the house. ' + room_description(state), False
-        return f'There is no room to the {direction} in this version.', True
-    return '', False
+    from adventure_world import handle_adventure_command
+    result = handle_adventure_command(prompt)
+    if result is None:
+        return "I am not sure how to do that.", clickable_links_html()
+    return result, clickable_links_html()
 
 
 def github_raw_url(filename):
