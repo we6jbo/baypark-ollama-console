@@ -19,6 +19,942 @@
         "how do i update network assistant",
         "check for updates"
       ]
+    },
+    {
+      "answer": "Target stable IT Specialist, systems support, network support, information security, vulnerability management, IAM, endpoint security, and cybersecurity analyst roles. Use Schedule A when applicable, but also apply competitively.",
+      "enabled": true,
+      "id": "career-best-fit",
+      "questions": [
+        "what should i know about best-fit jobs",
+        "help me with best-fit jobs"
+      ]
+    },
+    {
+      "answer": "Prioritize permanent federal IT and cybersecurity roles, then stable state-government IT roles in Virginia, Maryland, and Utah, followed by public universities, healthcare systems, utilities, and other established institutions.",
+      "enabled": true,
+      "id": "career-priority",
+      "questions": [
+        "what should i know about application priorities",
+        "help me with application priorities"
+      ]
+    },
+    {
+      "answer": "Treat $46,000 as a firm floor unless a role has exceptional benefits and a documented near-term promotion path above that amount.",
+      "enabled": true,
+      "id": "salary-floor",
+      "questions": [
+        "what should i know about minimum salary",
+        "help me with minimum salary"
+      ]
+    },
+    {
+      "answer": "Favor permanent, career, civil-service, or established institutional roles. Be cautious with temporary, term, grant-funded, seasonal, startup, and short-contract positions.",
+      "enabled": true,
+      "id": "job-stability",
+      "questions": [
+        "what should i know about job stability",
+        "help me with job stability"
+      ]
+    },
+    {
+      "answer": "Search first for 2210 Information Technology Management roles and related technical support, systems administration, network, information security, and cybersecurity work.",
+      "enabled": true,
+      "id": "federal-series",
+      "questions": [
+        "what should i know about federal job series",
+        "help me with federal job series"
+      ]
+    },
+    {
+      "answer": "Apply broadly to GS-7 and GS-9 roles when your education or experience meets the announcement. Consider lower grades only when there is a strong ladder and salary path.",
+      "enabled": true,
+      "id": "federal-grades",
+      "questions": [
+        "what should i know about federal grades",
+        "help me with federal grades"
+      ]
+    },
+    {
+      "answer": "Use Schedule A as an additional hiring path. Upload the letter, select the disability hiring path, contact SPPCs, and still apply through ordinary announcements.",
+      "enabled": true,
+      "id": "schedule-a",
+      "questions": [
+        "what should i know about Schedule A",
+        "help me with Schedule A"
+      ]
+    },
+    {
+      "answer": "Keep outreach brief: state your IT and cybersecurity interests, note Schedule A eligibility, summarize relevant education and experience, name target grades and locations, and ask whether your resume can be shared.",
+      "enabled": true,
+      "id": "sppc-email",
+      "questions": [
+        "what should i know about SPPC outreach",
+        "help me with SPPC outreach"
+      ]
+    },
+    {
+      "answer": "Use detailed accomplishment statements with dates, hours, tools, scope, users supported, problems solved, and measurable results. Match specialized-experience language truthfully.",
+      "enabled": true,
+      "id": "federal-resume",
+      "questions": [
+        "what should i know about federal resume",
+        "help me with federal resume"
+      ]
+    },
+    {
+      "answer": "Use a concise two-page resume focused on recent technical accomplishments, security-related work, tools, certifications, projects, and outcomes.",
+      "enabled": true,
+      "id": "private-resume",
+      "questions": [
+        "what should i know about private-sector resume",
+        "help me with private-sector resume"
+      ]
+    },
+    {
+      "answer": "Aim for five to ten well-matched applications per week. Track quality and follow-through rather than applying blindly.",
+      "enabled": true,
+      "id": "application-volume",
+      "questions": [
+        "what should i know about weekly applications",
+        "help me with weekly applications"
+      ]
+    },
+    {
+      "answer": "Track title, employer, announcement number, location, salary, closing date, hiring path, documents, submission date, status, and follow-up date.",
+      "enabled": true,
+      "id": "application-tracker",
+      "questions": [
+        "what should i know about application tracking",
+        "help me with application tracking"
+      ]
+    },
+    {
+      "answer": "Check eligibility, specialized experience, education substitution, salary, location, telework, travel, clearance, probation, physical requirements, and required documents.",
+      "enabled": true,
+      "id": "announcement-review",
+      "questions": [
+        "what should i know about job announcement review",
+        "help me with job announcement review"
+      ]
+    },
+    {
+      "answer": "Translate your real work into the announcement's required duties. Show comparable tasks, tools, complexity, independence, and results.",
+      "enabled": true,
+      "id": "specialized-experience",
+      "questions": [
+        "what should i know about specialized experience",
+        "help me with specialized experience"
+      ]
+    },
+    {
+      "answer": "Answer honestly and ensure every high-level response is supported by a specific resume example.",
+      "enabled": true,
+      "id": "questionnaire",
+      "questions": [
+        "what should i know about occupational questionnaire",
+        "help me with occupational questionnaire"
+      ]
+    },
+    {
+      "answer": "Use career fairs, SPPC contacts, professional associations, alumni networks, and informational interviews to learn about upcoming needs and entry routes.",
+      "enabled": true,
+      "id": "federal-networking",
+      "questions": [
+        "what should i know about federal networking",
+        "help me with federal networking"
+      ]
+    },
+    {
+      "answer": "Ask what entry roles are realistic, which skills are hard to hire, what tools are used, how candidates are evaluated, and what would make you more competitive.",
+      "enabled": true,
+      "id": "informational-interview",
+      "questions": [
+        "what should i know about informational interviews",
+        "help me with informational interviews"
+      ]
+    },
+    {
+      "answer": "Move through bridge roles involving access control, patching, endpoint security, vulnerability remediation, logging, compliance, or incident triage.",
+      "enabled": true,
+      "id": "career-transition",
+      "questions": [
+        "what should i know about transition to cybersecurity",
+        "help me with transition to cybersecurity"
+      ]
+    },
+    {
+      "answer": "Use a staged plan: complete Security+, strengthen scripting and security fundamentals, gain security-related duties, move into a hybrid role, then into dedicated cybersecurity.",
+      "enabled": true,
+      "id": "cyber-2035",
+      "questions": [
+        "what should i know about cybersecurity by 2035",
+        "help me with cybersecurity by 2035"
+      ]
+    },
+    {
+      "answer": "Finish Security+ preparation, update resumes, create saved searches, apply weekly, contact target agencies, practice interviews, and complete one explainable security project.",
+      "enabled": true,
+      "id": "next-90-days",
+      "questions": [
+        "what should i know about next 90 days",
+        "help me with next 90 days"
+      ]
+    },
+    {
+      "answer": "Earn Security+, improve one scripting skill, finish documented projects, expand contacts, and obtain a more advanced IT or hybrid IT-security role.",
+      "enabled": true,
+      "id": "next-year",
+      "questions": [
+        "what should i know about next 12 months",
+        "help me with next 12 months"
+      ]
+    },
+    {
+      "answer": "Compare opportunity volume, salary-to-cost ratio, federal presence, housing, benefits, transportation, and promotion potential. Virginia and Maryland usually offer more federal cyber density; Utah may offer lower costs.",
+      "enabled": true,
+      "id": "state-choice",
+      "questions": [
+        "what should i know about Virginia Maryland Utah choice",
+        "help me with Virginia Maryland Utah choice"
+      ]
+    },
+    {
+      "answer": "Search federal agencies, state IT, universities, healthcare, and established organizations for IT Specialist, systems, network, security operations, IAM, and compliance roles.",
+      "enabled": true,
+      "id": "maryland",
+      "questions": [
+        "what should i know about Maryland opportunities",
+        "help me with Maryland opportunities"
+      ]
+    },
+    {
+      "answer": "Search federal agencies, Virginia state government, universities, local government, and stable employers for 2210, systems, network, security, and support roles.",
+      "enabled": true,
+      "id": "virginia",
+      "questions": [
+        "what should i know about Virginia opportunities",
+        "help me with Virginia opportunities"
+      ]
+    },
+    {
+      "answer": "Search Utah state government, universities, municipalities, healthcare, and federal facilities. Verify salary and promotion paths carefully.",
+      "enabled": true,
+      "id": "utah",
+      "questions": [
+        "what should i know about Utah opportunities",
+        "help me with Utah opportunities"
+      ]
+    },
+    {
+      "answer": "Include remote and telework roles, but do not depend on them because competition is high. Prioritize direct matches.",
+      "enabled": true,
+      "id": "remote-work",
+      "questions": [
+        "what should i know about remote work",
+        "help me with remote work"
+      ]
+    },
+    {
+      "answer": "Apply when the employer can sponsor a clearance and you otherwise qualify. Skip roles requiring an active clearance at application time unless clearly stated otherwise.",
+      "enabled": true,
+      "id": "clearance",
+      "questions": [
+        "what should i know about clearance requirements",
+        "help me with clearance requirements"
+      ]
+    },
+    {
+      "answer": "Contracting can provide experience but is usually less stable. Consider it only when benefits, contract duration, and cybersecurity value are strong.",
+      "enabled": true,
+      "id": "contractor",
+      "questions": [
+        "what should i know about contractor versus government",
+        "help me with contractor versus government"
+      ]
+    },
+    {
+      "answer": "During probation, focus on attendance, written expectations, documentation, communication, and consistent performance.",
+      "enabled": true,
+      "id": "probation",
+      "questions": [
+        "what should i know about probationary periods",
+        "help me with probationary periods"
+      ]
+    },
+    {
+      "answer": "Look for permanent funding, essential mission work, low turnover, established teams, civil-service protections, strong benefits, and promotion history.",
+      "enabled": true,
+      "id": "stability-signs",
+      "questions": [
+        "what should i know about signs of a stable job",
+        "help me with signs of a stable job"
+      ]
+    },
+    {
+      "answer": "Compare retirement, pension, health costs, leave, holidays, insurance, telework, commute, training, promotion ladders, and stability.",
+      "enabled": true,
+      "id": "benefits",
+      "questions": [
+        "what should i know about benefits comparison",
+        "help me with benefits comparison"
+      ]
+    },
+    {
+      "answer": "Ask about higher-step placement, superior qualifications, recruitment incentives, and credit for prior experience when allowed.",
+      "enabled": true,
+      "id": "salary-negotiation",
+      "questions": [
+        "what should i know about salary negotiation",
+        "help me with salary negotiation"
+      ]
+    },
+    {
+      "answer": "Use a two-minute answer covering your technical identity, two or three strengths with examples, and the stable IT or cybersecurity role you seek.",
+      "enabled": true,
+      "id": "tell-me-about-yourself",
+      "questions": [
+        "what should i know about interview introduction",
+        "help me with interview introduction"
+      ]
+    },
+    {
+      "answer": "Choose a real but manageable weakness, explain the system you use to reduce it, and show improvement.",
+      "enabled": true,
+      "id": "interview-weakness",
+      "questions": [
+        "what should i know about interview weakness",
+        "help me with interview weakness"
+      ]
+    },
+    {
+      "answer": "Emphasize reliability, troubleshooting, documentation, user communication, long-term support experience, persistence, and security awareness.",
+      "enabled": true,
+      "id": "interview-strengths",
+      "questions": [
+        "what should i know about interview strengths",
+        "help me with interview strengths"
+      ]
+    },
+    {
+      "answer": "Structure answers as Situation, Task, Action, Result, then add what you learned.",
+      "enabled": true,
+      "id": "star-method",
+      "questions": [
+        "what should i know about STAR answers",
+        "help me with STAR answers"
+      ]
+    },
+    {
+      "answer": "Prepare ten STAR stories, rehearse aloud, review the announcement, and practice troubleshooting, teamwork, conflict, priorities, and customer service questions.",
+      "enabled": true,
+      "id": "interview-practice",
+      "questions": [
+        "what should i know about interview practice",
+        "help me with interview practice"
+      ]
+    },
+    {
+      "answer": "Use three to five people who can discuss reliability, technical work, communication, and results. Ask permission first.",
+      "enabled": true,
+      "id": "references",
+      "questions": [
+        "what should i know about professional references",
+        "help me with professional references"
+      ]
+    },
+    {
+      "answer": "Use a cover letter when requested or when explaining a transition, relocation, or mission interest. Focus on employer needs.",
+      "enabled": true,
+      "id": "cover-letter",
+      "questions": [
+        "what should i know about cover letters",
+        "help me with cover letters"
+      ]
+    },
+    {
+      "answer": "Follow the announcement's instructions. For other roles, a brief follow-up after one or two weeks is usually reasonable.",
+      "enabled": true,
+      "id": "follow-up",
+      "questions": [
+        "what should i know about application follow-up",
+        "help me with application follow-up"
+      ]
+    },
+    {
+      "answer": "Record the outcome, identify one improvement, request general feedback when appropriate, and keep applying.",
+      "enabled": true,
+      "id": "rejection",
+      "questions": [
+        "what should i know about handling rejection",
+        "help me with handling rejection"
+      ]
+    },
+    {
+      "answer": "Referred means HR sent your name to the selecting official. It does not guarantee an interview.",
+      "enabled": true,
+      "id": "referred",
+      "questions": [
+        "what should i know about USAJOBS referred status",
+        "help me with USAJOBS referred status"
+      ]
+    },
+    {
+      "answer": "Review eligibility, specialized experience, questionnaire answers, and documents. Contact HR politely if you believe there was an error.",
+      "enabled": true,
+      "id": "not-referred",
+      "questions": [
+        "what should i know about USAJOBS not referred",
+        "help me with USAJOBS not referred"
+      ]
+    },
+    {
+      "answer": "Verify salary, appointment type, benefits, probation, schedule, telework, travel, clearance, promotion potential, and cybersecurity relevance.",
+      "enabled": true,
+      "id": "offer-review",
+      "questions": [
+        "what should i know about job offer review",
+        "help me with job offer review"
+      ]
+    },
+    {
+      "answer": "Use the current objectives as a checklist and combine videos, notes, flashcards, labs, and timed practice exams.",
+      "enabled": true,
+      "id": "security-plus-plan",
+      "questions": [
+        "what should i know about Security+ study plan",
+        "help me with Security+ study plan"
+      ]
+    },
+    {
+      "answer": "Schedule when you score consistently well on fresh practice exams and can explain each objective in your own words.",
+      "enabled": true,
+      "id": "security-plus-ready",
+      "questions": [
+        "what should i know about Security+ readiness",
+        "help me with Security+ readiness"
+      ]
+    },
+    {
+      "answer": "For every miss, record the objective, why your answer was wrong, why the correct answer is best, and what clue you missed.",
+      "enabled": true,
+      "id": "missed-questions",
+      "questions": [
+        "what should i know about missed practice questions",
+        "help me with missed practice questions"
+      ]
+    },
+    {
+      "answer": "Use official domain weights, but spend extra time on your weakest areas.",
+      "enabled": true,
+      "id": "security-plus-domains",
+      "questions": [
+        "what should i know about Security+ study allocation",
+        "help me with Security+ study allocation"
+      ]
+    },
+    {
+      "answer": "Practice interpreting ping, traceroute, ip or ipconfig, ss or netstat, dig or nslookup, arp or ip neigh, curl, grep, and hashing tools.",
+      "enabled": true,
+      "id": "security-plus-commands",
+      "questions": [
+        "what should i know about Security+ commands",
+        "help me with Security+ commands"
+      ]
+    },
+    {
+      "answer": "Review CAs, RAs, CSRs, public and private keys, digital signatures, certificate chains, revocation, CRLs, and OCSP.",
+      "enabled": true,
+      "id": "pki",
+      "questions": [
+        "what should i know about PKI",
+        "help me with PKI"
+      ]
+    },
+    {
+      "answer": "Review identification, authentication, authorization, accounting, MFA, federation, SSO, least privilege, RBAC, ABAC, and privileged access.",
+      "enabled": true,
+      "id": "iam",
+      "questions": [
+        "what should i know about identity and access management",
+        "help me with identity and access management"
+      ]
+    },
+    {
+      "answer": "Review segmentation, VLANs, firewalls, proxies, VPNs, secure protocols, NAC, zero trust, IDS, IPS, and monitoring.",
+      "enabled": true,
+      "id": "network-security",
+      "questions": [
+        "what should i know about network security",
+        "help me with network security"
+      ]
+    },
+    {
+      "answer": "Study malware, phishing, password attacks, social engineering, web attacks, wireless attacks, supply-chain compromise, insiders, denial of service, and persistence.",
+      "enabled": true,
+      "id": "threats",
+      "questions": [
+        "what should i know about security threats",
+        "help me with security threats"
+      ]
+    },
+    {
+      "answer": "Know likelihood, impact, inherent and residual risk, appetite, tolerance, acceptance, avoidance, transfer, mitigation, SLE, ARO, and ALE.",
+      "enabled": true,
+      "id": "risk",
+      "questions": [
+        "what should i know about risk management",
+        "help me with risk management"
+      ]
+    },
+    {
+      "answer": "Review preparation, detection, analysis, containment, eradication, recovery, lessons learned, evidence preservation, communications, and escalation.",
+      "enabled": true,
+      "id": "incident-response",
+      "questions": [
+        "what should i know about incident response",
+        "help me with incident response"
+      ]
+    },
+    {
+      "answer": "Understand IaaS, PaaS, SaaS, deployment models, shared responsibility, identity, encryption, logging, misconfiguration, and resilience.",
+      "enabled": true,
+      "id": "cloud-security",
+      "questions": [
+        "what should i know about cloud security",
+        "help me with cloud security"
+      ]
+    },
+    {
+      "answer": "Review symmetric and asymmetric encryption, hashing, salting, digital signatures, key exchange, encryption at rest and in transit, and key management.",
+      "enabled": true,
+      "id": "cryptography",
+      "questions": [
+        "what should i know about cryptography",
+        "help me with cryptography"
+      ]
+    },
+    {
+      "answer": "Use one scenario-based question at a time, then explain the correct answer, each distractor, and the objective tested.",
+      "enabled": true,
+      "id": "security-plus-quiz",
+      "questions": [
+        "what should i know about Security+ quizzes",
+        "help me with Security+ quizzes"
+      ]
+    },
+    {
+      "answer": "Use a focused block: concept review, practice questions, explanation of misses, and a short command-line lab.",
+      "enabled": true,
+      "id": "study-session",
+      "questions": [
+        "what should i know about daily Security+ session",
+        "help me with daily Security+ session"
+      ]
+    },
+    {
+      "answer": "Confirm requirements, sleep, arrive early, avoid cramming, manage time, flag difficult items, and review.",
+      "enabled": true,
+      "id": "exam-day",
+      "questions": [
+        "what should i know about Security+ exam day",
+        "help me with Security+ exam day"
+      ]
+    },
+    {
+      "answer": "Build small projects in logging, vulnerability scanning, secure Linux administration, permissions, incident response, and network diagrams.",
+      "enabled": true,
+      "id": "home-lab",
+      "questions": [
+        "what should i know about home lab",
+        "help me with home lab"
+      ]
+    },
+    {
+      "answer": "Choose a project with a problem statement, architecture, threat model, code, test plan, findings, remediation, and lessons learned.",
+      "enabled": true,
+      "id": "portfolio-project",
+      "questions": [
+        "what should i know about portfolio project",
+        "help me with portfolio project"
+      ]
+    },
+    {
+      "answer": "Publish sanitized projects with clear READMEs, installation instructions, licenses, tests, and no credentials or private infrastructure details.",
+      "enabled": true,
+      "id": "github-portfolio",
+      "questions": [
+        "what should i know about GitHub portfolio",
+        "help me with GitHub portfolio"
+      ]
+    },
+    {
+      "answer": "Explain the problem, architecture, your role, technologies, security controls, failures, diagnosis, fix, validation, and lessons.",
+      "enabled": true,
+      "id": "project-interview",
+      "questions": [
+        "what should i know about project interview explanation",
+        "help me with project interview explanation"
+      ]
+    },
+    {
+      "answer": "Practice permissions, users, groups, systemd, logs, networking, packages, SSH, processes, storage, Bash, Python, and hardening.",
+      "enabled": true,
+      "id": "linux-skills",
+      "questions": [
+        "what should i know about Linux skills",
+        "help me with Linux skills"
+      ]
+    },
+    {
+      "answer": "Focus on file handling, JSON, subprocess safety, logging, exceptions, argparse, testing, virtual environments, regex, and validation.",
+      "enabled": true,
+      "id": "python-skills",
+      "questions": [
+        "what should i know about Python skills",
+        "help me with Python skills"
+      ]
+    },
+    {
+      "answer": "Practice object pipelines, services, event logs, users, permissions, networking, error handling, remoting concepts, and script security.",
+      "enabled": true,
+      "id": "powershell-skills",
+      "questions": [
+        "what should i know about PowerShell skills",
+        "help me with PowerShell skills"
+      ]
+    },
+    {
+      "answer": "Review TCP/IP, subnetting, DNS, DHCP, routing, switching, VLANs, wireless, VPNs, firewalls, NAT, packet captures, and ports.",
+      "enabled": true,
+      "id": "networking-skills",
+      "questions": [
+        "what should i know about networking skills",
+        "help me with networking skills"
+      ]
+    },
+    {
+      "answer": "Learn domains, forests, OUs, users, groups, Group Policy, Kerberos, NTLM, permissions, service accounts, delegation, and logging.",
+      "enabled": true,
+      "id": "active-directory",
+      "questions": [
+        "what should i know about Active Directory",
+        "help me with Active Directory"
+      ]
+    },
+    {
+      "answer": "Start with shared responsibility, identity, networking, logging, storage permissions, encryption, and one major cloud platform.",
+      "enabled": true,
+      "id": "cloud-career",
+      "questions": [
+        "what should i know about cloud learning",
+        "help me with cloud learning"
+      ]
+    },
+    {
+      "answer": "Choose based on target roles. Consider networking, cloud, Linux, Microsoft, or entry cybersecurity credentials, paired with projects.",
+      "enabled": true,
+      "id": "next-cert",
+      "questions": [
+        "what should i know about certification after Security+",
+        "help me with certification after Security+"
+      ]
+    },
+    {
+      "answer": "Use your education to support qualification and commitment, then pair it with practical examples.",
+      "enabled": true,
+      "id": "degree-value",
+      "questions": [
+        "what should i know about using education",
+        "help me with using education"
+      ]
+    },
+    {
+      "answer": "Highlight access control, endpoint configuration, patching, malware response, secure troubleshooting, logging, inventory, and incident escalation.",
+      "enabled": true,
+      "id": "support-to-cyber",
+      "questions": [
+        "what should i know about support experience to cyber",
+        "help me with support experience to cyber"
+      ]
+    },
+    {
+      "answer": "Request accommodations when needed and describe the functional need and effective support without disclosing more detail than necessary.",
+      "enabled": true,
+      "id": "accommodation",
+      "questions": [
+        "what should i know about workplace accommodation",
+        "help me with workplace accommodation"
+      ]
+    },
+    {
+      "answer": "Review documentation rules early, submit before scheduling when possible, and keep approval records.",
+      "enabled": true,
+      "id": "exam-accommodation",
+      "questions": [
+        "what should i know about testing accommodation",
+        "help me with testing accommodation"
+      ]
+    },
+    {
+      "answer": "Use written checklists, tickets, calendar reminders, SOPs, priority confirmation, and end-of-day review.",
+      "enabled": true,
+      "id": "organization",
+      "questions": [
+        "what should i know about work organization",
+        "help me with work organization"
+      ]
+    },
+    {
+      "answer": "Ask for written steps, repeat back the request, break it into checkpoints, and verify completion.",
+      "enabled": true,
+      "id": "complex-instructions",
+      "questions": [
+        "what should i know about complex instructions",
+        "help me with complex instructions"
+      ]
+    },
+    {
+      "answer": "Explain the issue plainly, what you checked, the next step, expectations, and confirmation of success.",
+      "enabled": true,
+      "id": "technical-communication",
+      "questions": [
+        "what should i know about technical communication",
+        "help me with technical communication"
+      ]
+    },
+    {
+      "answer": "Include purpose, scope, prerequisites, steps, expected results, rollback, validation, ownership, and revision date.",
+      "enabled": true,
+      "id": "documentation",
+      "questions": [
+        "what should i know about technical documentation",
+        "help me with technical documentation"
+      ]
+    },
+    {
+      "answer": "Record current state, back up, define success and rollback, test, review the diff, make one change, validate, document, and monitor.",
+      "enabled": true,
+      "id": "change-control",
+      "questions": [
+        "what should i know about change control",
+        "help me with change control"
+      ]
+    },
+    {
+      "answer": "Back up exact files, permissions, ownership, configuration, and service state, and verify restoration.",
+      "enabled": true,
+      "id": "backup",
+      "questions": [
+        "what should i know about backups",
+        "help me with backups"
+      ]
+    },
+    {
+      "answer": "Use SHA-256 to verify approved file identity before and after deployment. Still review and test the code.",
+      "enabled": true,
+      "id": "checksums",
+      "questions": [
+        "what should i know about checksums",
+        "help me with checksums"
+      ]
+    },
+    {
+      "answer": "A clean tree prevents automation from mixing unrelated changes. Review status and resolve each item deliberately.",
+      "enabled": true,
+      "id": "git-clean",
+      "questions": [
+        "what should i know about clean Git tree",
+        "help me with clean Git tree"
+      ]
+    },
+    {
+      "answer": "Use `git add -- FILE` and `git commit --only FILE -m \"message\"`, then verify the staged names.",
+      "enabled": true,
+      "id": "commit-one-file",
+      "questions": [
+        "what should i know about commit one file",
+        "help me with commit one file"
+      ]
+    },
+    {
+      "answer": "Find the last known-good commit, restore only affected files, validate, create a corrective commit, and deploy deliberately.",
+      "enabled": true,
+      "id": "git-recovery",
+      "questions": [
+        "what should i know about Git recovery",
+        "help me with Git recovery"
+      ]
+    },
+    {
+      "answer": "Use `.gitignore`, example configs, environment variables or a secret manager, staged-diff review, and secret scanning.",
+      "enabled": true,
+      "id": "secrets",
+      "questions": [
+        "what should i know about GitHub secrets",
+        "help me with GitHub secrets"
+      ]
+    },
+    {
+      "answer": "Include purpose, features, architecture, requirements, installation, configuration, usage, security, update model, examples, license, and customization.",
+      "enabled": true,
+      "id": "readme",
+      "questions": [
+        "what should i know about README quality",
+        "help me with README quality"
+      ]
+    },
+    {
+      "answer": "Create an AI.md describing architecture, authoritative files, generated outputs, protected files, tests, safety rules, and licensing.",
+      "enabled": true,
+      "id": "ai-guidance",
+      "questions": [
+        "what should i know about AI guidance",
+        "help me with AI guidance"
+      ]
+    },
+    {
+      "answer": "GPLv3 allows use, study, modification, and redistribution, while requiring corresponding source and the same license for distributed modifications.",
+      "enabled": true,
+      "id": "gpl",
+      "questions": [
+        "what should i know about GPLv3",
+        "help me with GPLv3"
+      ]
+    },
+    {
+      "answer": "Remove secrets, replace local values with examples, add license and documentation, validate, review history, and test from a fresh clone.",
+      "enabled": true,
+      "id": "public-release",
+      "questions": [
+        "what should i know about public release checklist",
+        "help me with public release checklist"
+      ]
+    },
+    {
+      "answer": "Review authentication, exposure, permissions, input validation, update integrity, command execution, logging, secrets, dependencies, backups, and least privilege.",
+      "enabled": true,
+      "id": "security-review",
+      "questions": [
+        "what should i know about project security review",
+        "help me with project security review"
+      ]
+    },
+    {
+      "answer": "Do not expose directly without authentication, HTTPS, reverse proxy controls, firewalling, rate limits, patching, monitoring, and review.",
+      "enabled": true,
+      "id": "internet-exposure",
+      "questions": [
+        "what should i know about internet exposure",
+        "help me with internet exposure"
+      ]
+    },
+    {
+      "answer": "Run under a dedicated account with only needed files and permissions. Separate runtime, publishing, and administration.",
+      "enabled": true,
+      "id": "least-privilege",
+      "questions": [
+        "what should i know about least privilege",
+        "help me with least privilege"
+      ]
+    },
+    {
+      "answer": "Monitor service restarts, update attempts, validation failures, unexpected file changes, network errors, and Git publishing failures.",
+      "enabled": true,
+      "id": "monitoring",
+      "questions": [
+        "what should i know about logs and monitoring",
+        "help me with logs and monitoring"
+      ]
+    },
+    {
+      "answer": "Add tests for command routing, update allowlists, room connectivity, imports, backups, protected files, JSON validation, and HTTP health.",
+      "enabled": true,
+      "id": "testing",
+      "questions": [
+        "what should i know about automated testing",
+        "help me with automated testing"
+      ]
+    },
+    {
+      "answer": "Separate app releases from generated content: review, version, compile, test, checksum, commit manually, deploy, verify, and roll back if needed.",
+      "enabled": true,
+      "id": "release-process",
+      "questions": [
+        "what should i know about application releases",
+        "help me with application releases"
+      ]
+    },
+    {
+      "answer": "This project demonstrates Python, Linux, Git, systemd, Raspberry Pi, web interfaces, JSON, automation, troubleshooting, backups, validation, and change control.",
+      "enabled": true,
+      "id": "project-career",
+      "questions": [
+        "what should i know about project career value",
+        "help me with project career value"
+      ]
+    },
+    {
+      "answer": "Describe the problem, architecture, technologies, safeguards, one failure and recovery lesson, and the result. Link only to sanitized public material.",
+      "enabled": true,
+      "id": "linkedin",
+      "questions": [
+        "what should i know about sharing on LinkedIn",
+        "help me with sharing on LinkedIn"
+      ]
+    },
+    {
+      "answer": "Use a concise accomplishment showing that you built and maintained a Python Raspberry Pi Network Assistant with Git updates, systemd automation, validation, backups, and rollback.",
+      "enabled": true,
+      "id": "resume-bullet",
+      "questions": [
+        "what should i know about project resume bullet",
+        "help me with project resume bullet"
+      ]
+    },
+    {
+      "answer": "Include a sanitized architecture diagram, screenshots, features, technologies, security design, deployment workflow, tests, troubleshooting, and lessons.",
+      "enabled": true,
+      "id": "portfolio-page",
+      "questions": [
+        "what should i know about portfolio page",
+        "help me with portfolio page"
+      ]
+    },
+    {
+      "answer": "Review applications, responses, Security+ progress, contacts, project work, interviews, and next week's top three actions.",
+      "enabled": true,
+      "id": "weekly-review",
+      "questions": [
+        "what should i know about weekly career review",
+        "help me with weekly career review"
+      ]
+    },
+    {
+      "answer": "Measure applications, referrals, interviews, certifications, technical evidence, contacts, salary range, locations, and cybersecurity progress.",
+      "enabled": true,
+      "id": "monthly-review",
+      "questions": [
+        "what should i know about monthly career review",
+        "help me with monthly career review"
+      ]
+    },
+    {
+      "answer": "Use a fixed schedule, small targets, rest, reusable templates, and separate blocks for applications, study, and projects.",
+      "enabled": true,
+      "id": "burnout",
+      "questions": [
+        "what should i know about job-search burnout",
+        "help me with job-search burnout"
+      ]
+    },
+    {
+      "answer": "Score stability, salary, benefits, permanence, cybersecurity relevance, promotion, location, management, training, and sustainability.",
+      "enabled": true,
+      "id": "compare-offers",
+      "questions": [
+        "what should i know about compare job offers",
+        "help me with compare job offers"
+      ]
     }
   ],
   "schema_version": 1
