@@ -28,7 +28,7 @@ CONFIG_PATH = APP_DIR / 'config.json'
 ADVENTURE_STATE_PATH = APP_DIR / 'adventure_state.json'
 PERMISSION_REPAIR_LOG_PATH = APP_DIR / 'update-permission-repair.log'
 DECISION_QUEUE_DB = Path('/var/lib/baypark-decision-queue/questions.sqlite3')
-APP_VERSION = '7.609.0'
+APP_VERSION = '7.609.1'
 MAX_FETCH_BYTES = 160000
 FETCH_TIMEOUT = 10
 RESTART_REQUESTED = False
@@ -265,6 +265,22 @@ def room_description(state):
 
 
 def adventure_command(prompt):
+    # Prefer the generated MaaazeRunner adventure when its engine recognizes
+    # the command. Unrecognized commands continue to the original built-in game.
+    try:
+        from adventure_world import handle_adventure_command
+        generated_reply = handle_adventure_command(prompt)
+    except (ImportError, FileNotFoundError):
+        generated_reply = None
+    except Exception as exc:
+        return (
+            f'Generated adventure error: {type(exc).__name__}: {exc}',
+            False,
+        )
+
+    if generated_reply is not None:
+        return generated_reply, False
+
     state = adventure_state()
     low = re.sub(r'\s+', ' ', prompt.lower().strip())
     if low in {'reset game', 'reset adventure', 'restart game'}:
@@ -349,14 +365,13 @@ def app_version_from_bytes(data):
 
 def validate_update(filename, data):
     if filename == 'app.py':
-        compile(data.decode('utf-8'), filename, 'exec')
-        if b'APP_DIR' not in data or b'Network Assistant AI' not in data:
-            raise ValueError('Remote app.py did not pass identity checks')
-        remote_version = app_version_from_bytes(data)
-        if version_tuple(remote_version) < version_tuple(APP_VERSION):
-            raise ValueError(f'Refusing downgrade from {APP_VERSION} to {remote_version}')
-    elif filename.endswith('.json'):
+        raise ValueError(
+            'app.py is protected and cannot be replaced by check updates'
+        )
+    if filename.endswith('.json'):
         json.loads(data.decode('utf-8'))
+    elif filename.endswith('.py'):
+        compile(data.decode('utf-8'), filename, 'exec')
 
 
 def atomic_install(filename, data):
@@ -383,7 +398,12 @@ def check_github_updates():
     changed = []
     unavailable = []
     errors = []
-    for filename in ('app.py', 'sources.json'):
+    for filename in (
+        'sources.json',
+        'adventure_world.json',
+        'adventure_world.py',
+        'decision_tree_known_answers.json',
+    ):
         try:
             data = download_bytes(github_raw_url(filename))
             validate_update(filename, data)
@@ -396,7 +416,7 @@ def check_github_updates():
                 errors.append(f'{filename}: HTTP {exc.code}')
         except Exception as exc:
             errors.append(f'{filename}: {type(exc).__name__}: {exc}')
-    if 'app.py' in changed:
+    if 'adventure_world.py' in changed:
         RESTART_REQUESTED = True
     parts = []
     if changed:

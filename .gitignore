@@ -5,3 +5,6 @@ __pycache__/
 
 # Manual app.py recovery backups
 app.py.before-restore-*
+
+# Generated adventure runtime state
+adventure_player_state.json
