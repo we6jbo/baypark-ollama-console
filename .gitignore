@@ -2,3 +2,6 @@
 # Python runtime cache
 __pycache__/
 *.pyc
+
+# Manual app.py recovery backups
+app.py.before-restore-*
