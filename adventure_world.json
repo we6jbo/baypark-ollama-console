@@ -111,7 +111,7 @@
   "rooms": {
     "button_hall": {
       "dark": false,
-      "description": "Three buttons glow blue, amber, and green.",
+      "description": "In this room, three buttons glow blue, amber, and green.",
       "exits": {
         "west": "mill_room"
       },
